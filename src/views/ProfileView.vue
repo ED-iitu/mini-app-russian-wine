@@ -20,8 +20,22 @@
       </div>
     </div>
 
+    <!-- Orders -->
+    <div class="section-title">Мои заказы</div>
+    <div v-if="ordersLoading" class="loader-center"><div class="spinner" /></div>
+    <div v-else-if="orders.length === 0" class="orders-empty">Заказов пока нет</div>
+    <div v-else class="orders-list">
+      <div v-for="order in orders" :key="order.id" class="order-card">
+        <div class="order-card__left">
+          <div class="order-card__id">Заказ #{{ order.id }}</div>
+          <div class="order-card__meta">{{ order.date }} · {{ order.items_count }} шт.</div>
+        </div>
+        <div class="order-card__total">{{ order.total }} ₽</div>
+      </div>
+    </div>
+
     <!-- About shop -->
-    <div class="section-title">О магазине</div>
+    <div class="section-title" style="margin-top:8px">О магазине</div>
     <div class="info-cards">
       <a href="https://russianvine.ru" target="_blank" class="info-card">
         <span class="info-card__icon">🌐</span>
@@ -88,7 +102,8 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { orderApi } from '../api'
 
 const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
 
@@ -102,6 +117,21 @@ const initials = computed(() => {
   const f = tgUser.first_name?.[0] || ''
   const l = tgUser.last_name?.[0] || ''
   return (f + l).toUpperCase() || '?'
+})
+
+const orders = ref([])
+const ordersLoading = ref(false)
+
+onMounted(async () => {
+  const chatId = tgUser?.id
+  if (!chatId) return
+  ordersLoading.value = true
+  try {
+    const { data } = await orderApi.getUserOrders(chatId)
+    orders.value = data.orders
+  } finally {
+    ordersLoading.value = false
+  }
 })
 </script>
 
@@ -235,6 +265,52 @@ a.info-card:active { background: var(--bg-card2); }
   color: var(--text-muted);
   line-height: 1.5;
   padding-top: 4px;
+}
+
+.orders-empty {
+  margin: 0 16px 8px;
+  padding: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 14px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.orders-list {
+  margin: 0 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.order-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.order-card:last-child { border-bottom: none; }
+
+.order-card__id {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.order-card__meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.order-card__total {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent2);
 }
 
 .age-disclaimer {

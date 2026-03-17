@@ -21,6 +21,9 @@ export const winesApi = {
 export const orderApi = {
   create(data) {
     return api.post('/order', data)
+  },
+  getUserOrders(telegram_chat_id) {
+    return api.get('/orders', { params: { telegram_chat_id } })
   }
 }
 
