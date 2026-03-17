@@ -108,9 +108,14 @@ const hasAnyActiveFilter = computed(() =>
 )
 
 onMounted(async () => {
-  if (store.wines.length === 0) {
+  if (store.wines.length === 0 && !store.loading) {
     await store.loadWines(true)
     store.loadFilters()
+  } else if (store.loading) {
+    // уже грузится из App.vue — ждём
+    await new Promise(resolve => {
+      const stop = setInterval(() => { if (!store.loading) { clearInterval(stop); resolve() } }, 50)
+    })
   }
   setupObserver()
 })

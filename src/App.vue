@@ -14,6 +14,7 @@
 import { onMounted } from 'vue'
 import BottomNav from './components/BottomNav.vue'
 import Toast from './components/Toast.vue'
+import { useWinesStore } from './stores/wines'
 
 onMounted(() => {
   const tg = window.Telegram?.WebApp
@@ -23,6 +24,10 @@ onMounted(() => {
     tg.setHeaderColor?.('#f2ebe0')
     tg.setBackgroundColor?.('#f2ebe0')
   }
+
+  const store = useWinesStore()
+  store.loadWines(true)
+  store.loadFilters()
 })
 </script>
 
