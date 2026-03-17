@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useWinesStore } from '../stores/wines'
 import WineCard from '../components/WineCard.vue'
 import FilterDrawer from '../components/FilterDrawer.vue'
@@ -111,13 +111,12 @@ onMounted(async () => {
   if (store.wines.length === 0 && !store.loading) {
     await store.loadWines(true)
     store.loadFilters()
-  } else if (store.loading) {
-    // уже грузится из App.vue — ждём
-    await new Promise(resolve => {
-      const stop = setInterval(() => { if (!store.loading) { clearInterval(stop); resolve() } }, 50)
-    })
   }
   setupObserver()
+})
+
+watch(() => store.wines.length, (len) => {
+  if (len > 0 && !observer) setupObserver()
 })
 
 let observer = null
