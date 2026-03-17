@@ -26,11 +26,22 @@
     <div v-else-if="orders.length === 0" class="orders-empty">Заказов пока нет</div>
     <div v-else class="orders-list">
       <div v-for="order in orders" :key="order.id" class="order-card">
-        <div class="order-card__left">
-          <div class="order-card__id">Заказ #{{ order.id }}</div>
-          <div class="order-card__meta">{{ order.date }} · {{ order.items_count }} шт.</div>
+        <div class="order-card__header">
+          <div class="order-card__left">
+            <div class="order-card__id">Заказ #{{ order.id }}</div>
+            <div class="order-card__meta">{{ order.date }} · {{ order.items_count }} шт.</div>
+          </div>
+          <div class="order-card__total">{{ order.total.toLocaleString('ru') }} ₽</div>
         </div>
-        <div class="order-card__total">{{ order.total }} ₽</div>
+        <div v-if="order.items && order.items.length" class="order-items">
+          <div v-for="(item, i) in order.items" :key="i" class="order-item">
+            <div class="order-item__title">{{ item.title }}</div>
+            <div class="order-item__right">
+              <span class="order-item__qty">{{ item.qty }} шт.</span>
+              <span class="order-item__price">{{ (item.price * item.qty).toLocaleString('ru') }} ₽</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -287,13 +298,16 @@ a.info-card:active { background: var(--bg-card2); }
 }
 
 .order-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 .order-card:last-child { border-bottom: none; }
+
+.order-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 10px;
+}
 
 .order-card__id {
   font-size: 15px;
@@ -311,6 +325,52 @@ a.info-card:active { background: var(--bg-card2); }
   font-size: 15px;
   font-weight: 700;
   color: var(--accent2);
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+.order-items {
+  padding: 0 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.order-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card2);
+  border-radius: var(--radius-sm);
+}
+
+.order-item__title {
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.3;
+  flex: 1;
+}
+
+.order-item__right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.order-item__qty {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.order-item__price {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-light);
+  white-space: nowrap;
 }
 
 .age-disclaimer {
