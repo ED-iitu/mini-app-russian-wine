@@ -24,6 +24,9 @@ export const orderApi = {
   },
   getUserOrders(telegram_chat_id) {
     return api.get('/orders', { params: { telegram_chat_id } })
+  },
+  getOrder(id, telegram_chat_id) {
+    return api.get(`/orders/${id}`, { params: { telegram_chat_id } })
   }
 }
 

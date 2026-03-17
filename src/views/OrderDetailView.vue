@@ -6,51 +6,65 @@
           <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
-      <h1>Заказ #{{ order.id }}</h1>
+      <h1>Заказ #{{ route.params.id }}</h1>
     </div>
 
-    <div class="order-meta card-block">
-      <div class="meta-row">
-        <span class="meta-label">Дата</span>
-        <span class="meta-val">{{ order.date }}</span>
-      </div>
-      <div class="meta-row">
-        <span class="meta-label">Позиций</span>
-        <span class="meta-val">{{ order.items_count }} шт.</span>
-      </div>
-      <div class="meta-row">
-        <span class="meta-label">Итого</span>
-        <span class="meta-val total">{{ order.total.toLocaleString('ru') }} ₽</span>
-      </div>
-    </div>
+    <div v-if="loading" class="loader-center"><div class="spinner" /></div>
 
-    <div class="section-title">Состав заказа</div>
-
-    <div v-if="order.items && order.items.length" class="items-list card-block">
-      <div v-for="(item, i) in order.items" :key="i" class="item-row">
-        <div class="item-info">
-          <div class="item-title">{{ item.title }}</div>
-          <div class="item-qty">{{ item.qty }} шт. × {{ item.price.toLocaleString('ru') }} ₽</div>
+    <template v-else-if="order">
+      <div class="order-meta card-block">
+        <div class="meta-row">
+          <span class="meta-label">Дата</span>
+          <span class="meta-val">{{ order.date }}</span>
         </div>
-        <div class="item-total">{{ (item.price * item.qty).toLocaleString('ru') }} ₽</div>
+        <div class="meta-row">
+          <span class="meta-label">Позиций</span>
+          <span class="meta-val">{{ order.items_count }} шт.</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Итого</span>
+          <span class="meta-val total">{{ order.total.toLocaleString('ru') }} ₽</span>
+        </div>
       </div>
-    </div>
 
-    <div v-else class="orders-empty">Данные о составе заказа недоступны</div>
+      <div class="section-title">Состав заказа</div>
+
+      <div v-if="order.items && order.items.length" class="items-list card-block">
+        <div v-for="(item, i) in order.items" :key="i" class="item-row">
+          <div class="item-info">
+            <div class="item-title">{{ item.title }}</div>
+            <div class="item-qty">{{ item.qty }} шт. × {{ item.price.toLocaleString('ru') }} ₽</div>
+          </div>
+          <div class="item-total">{{ (item.price * item.qty).toLocaleString('ru') }} ₽</div>
+        </div>
+      </div>
+      <div v-else class="orders-empty">Данные о составе заказа недоступны</div>
+    </template>
+
+    <div v-else class="orders-empty">Заказ не найден</div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { orderApi } from '../api'
 
 const router = useRouter()
 const route = useRoute()
 
-const order = computed(() => {
-  const state = history.state?.order
-  if (state) return state
-  return { id: route.params.id, date: '—', total: 0, items_count: 0, items: [] }
+const order = ref(null)
+const loading = ref(true)
+
+const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user
+
+onMounted(async () => {
+  try {
+    const { data } = await orderApi.getOrder(route.params.id, tgUser?.id)
+    order.value = data.order
+  } finally {
+    loading.value = false
+  }
 })
 </script>
 
