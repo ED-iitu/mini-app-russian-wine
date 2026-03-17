@@ -1,10 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import CatalogView from '../views/CatalogView.vue'
 
 const routes = [
   {
     path: '/',
     name: 'catalog',
-    component: () => import('../views/CatalogView.vue')
+    component: CatalogView
   },
   {
     path: '/wine/:id',
