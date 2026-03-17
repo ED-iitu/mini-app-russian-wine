@@ -3,7 +3,7 @@
     <div class="page-header">
       <div class="catalog-header">
         <div>
-          <h1>Каталог вин</h1>
+          <h1>Каталог вин1</h1>
           <p class="subtitle" v-if="store.pagination">
             <template v-if="store.searchQuery">
               {{ store.displayWines.length }} результатов
