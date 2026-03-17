@@ -8,9 +8,13 @@
 
 <script setup>
 import { onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import BottomNav from './components/BottomNav.vue'
 import Toast from './components/Toast.vue'
 import { useWinesStore } from './stores/wines'
+
+const router = useRouter()
+const route = useRoute()
 
 onMounted(() => {
   const tg = window.Telegram?.WebApp
@@ -19,6 +23,10 @@ onMounted(() => {
     tg.expand()
     tg.setHeaderColor?.('#f2ebe0')
     tg.setBackgroundColor?.('#f2ebe0')
+  }
+
+  if (!route.name) {
+    router.replace('/')
   }
 
   const store = useWinesStore()
