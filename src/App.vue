@@ -1,10 +1,6 @@
 <template>
   <div class="app-root">
-    <router-view v-slot="{ Component, route }">
-      <transition name="fade">
-        <component :is="Component" :key="route.fullPath" />
-      </transition>
-    </router-view>
+    <router-view />
     <BottomNav />
     <Toast />
   </div>
