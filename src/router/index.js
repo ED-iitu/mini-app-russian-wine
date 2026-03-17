@@ -28,6 +28,11 @@ const routes = [
     component: () => import('../views/ProfileView.vue')
   },
   {
+    path: '/order/:id',
+    name: 'order',
+    component: () => import('../views/OrderDetailView.vue')
+  },
+  {
     path: '/:pathMatch(.*)*',
     redirect: '/'
   }
